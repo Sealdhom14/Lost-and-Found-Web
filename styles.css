@@ -1,10 +1,5 @@
 /* ===== Global ===== */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Inter", sans-serif;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: "Inter", sans-serif; }
 
 body {
   background: #f4f6fb;
@@ -20,7 +15,7 @@ body {
   width: 420px;
   padding: 35px;
   border-radius: 18px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
   animation: fadeIn 0.4s ease;
 }
 
@@ -41,11 +36,10 @@ input {
   font-size: 15px;
   transition: 0.2s ease;
 }
-
 input:focus {
   border-color: #4a73ff;
   outline: none;
-  box-shadow: 0 0 5px rgba(74, 115, 255, 0.3);
+  box-shadow: 0 0 5px rgba(74,115,255,0.3);
 }
 
 button {
@@ -60,35 +54,30 @@ button {
   transition: 0.2s ease;
   font-weight: 600;
 }
-
-button:hover {
-  background: #345eef;
-}
+button:hover { background: #345eef; }
 
 .alt-link {
   text-align: center;
   margin-top: 15px;
   font-size: 14px;
 }
-
 .alt-link a {
   color: #4a73ff;
   text-decoration: none;
   font-weight: 600;
 }
+.alt-link a:hover { text-decoration: underline; }
 
-.alt-link a:hover {
-  text-decoration: underline;
-}
-
-/* ===== Dashboard Styling ===== */
+/* ===== Dashboard ===== */
 .dashboard-container {
-  max-width: 1100px;
+  width: 95%;
+  max-width: 1200px;
   margin: 40px auto;
   background: #fff;
   padding: 30px;
   border-radius: 20px;
-  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 6px 25px rgba(0,0,0,0.05);
+  animation: fadeIn 0.4s ease;
 }
 
 .dashboard-title {
@@ -102,7 +91,7 @@ button:hover {
   background: #f8faff;
   padding: 20px;
   border-radius: 14px;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4px 18px rgba(0,0,0,0.04);
   margin-bottom: 20px;
 }
 
@@ -112,8 +101,7 @@ button:hover {
   margin-top: 15px;
 }
 
-.table th,
-.table td {
+.table th, .table td {
   padding: 12px;
   border-bottom: 1px solid #e5e8f1;
 }
@@ -124,14 +112,14 @@ button:hover {
   color: #445;
 }
 
-/* Fade in animation */
+.logout-btn {
+  float: right;
+  background: #ff5252 !important;
+}
+.logout-btn:hover { background: #e33d3d !important; }
+
+/* Animation */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(5px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
 }
