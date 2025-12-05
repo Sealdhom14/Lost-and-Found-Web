@@ -1,59 +1,51 @@
 <!doctype html>
 <html>
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8">
   <title>User Dashboard</title>
   <link rel="stylesheet" href="../styles.css">
 </head>
 <body>
   <div class="container">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-      <h2>Lost & Found — Home</h2>
-      <div>
-        <span id="userLabel" class="small"></span>
-        <button id="btnLogout" class="secondary">Logout</button>
-      </div>
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h2>Lost & Found</h2>
+      <div><span id="userLabel" class="small"></span> <button id="btnLogout">Logout</button></div>
     </div>
 
     <div class="layout">
-      <!-- Messages (left) -->
       <div class="col">
         <h4>Messages</h4>
-        <div id="messagesList">No messages</div>
+        <div id="messagesList"></div>
       </div>
 
-      <!-- Lost items -->
       <div class="main-col">
-        <div class="header">
+        <div class="header" style="display:flex;justify-content:space-between;align-items:center">
           <h3>Lost Items</h3>
           <button id="btnNewPost">New Post</button>
         </div>
         <div id="lostList">Loading...</div>
       </div>
 
-      <!-- Found items -->
       <div class="main-col">
-        <div class="header"><h3>Found Items</h3></div>
+        <h3>Found Items</h3>
         <div id="foundList">Loading...</div>
       </div>
 
-      <!-- Notifications (right) -->
       <div class="col">
         <h4>Notifications</h4>
-        <div id="notifications">No notifications</div>
+        <div id="notifications"></div>
       </div>
     </div>
   </div>
 
-  <!-- Create post modal inline -->
-  <div id="postModal" class="auth-card hidden" style="position:fixed;right:20px;bottom:20px;width:360px;z-index:999">
+  <!-- post modal inline -->
+  <div id="postModal" class="auth-card hidden" style="position:fixed;right:20px;bottom:20px;width:360px;z-index:999;">
     <h3>Create Post</h3>
     <select id="postType"><option value="lost">Lost</option><option value="found">Found</option></select>
-    <textarea id="postText" placeholder="Describe item..." style="height:90px"></textarea>
-    <label class="small">Optional image</label>
-    <input id="postImage" type="file" accept="image/*" />
-    <div class="row" style="margin-top:8px">
-      <button id="btnSubmitPost">Submit (Request approval)</button>
+    <textarea id="postText" placeholder="Describe item..." style="height:80px"></textarea>
+    <input id="postImage" type="file" accept="image/*">
+    <div style="display:flex;gap:8px;">
+      <button id="btnSubmitPost">Submit (request approval)</button>
       <button id="btnCancelPost" class="secondary">Cancel</button>
     </div>
     <p id="postStatus" class="small"></p>
@@ -70,10 +62,10 @@
   <script src="../scripts/user.js"></script>
 
   <script>
-    document.getElementById('btnLogout').addEventListener('click', logout);
-    document.getElementById('btnNewPost').addEventListener('click', ()=>document.getElementById('postModal').classList.remove('hidden'));
-    document.getElementById('btnCancelPost').addEventListener('click', ()=>document.getElementById('postModal').classList.add('hidden'));
-    document.getElementById('btnSubmitPost').addEventListener('click', submitPostRequest);
+    document.getElementById('btnLogout').addEventListener('click', window.logout);
+    document.getElementById('btnNewPost').addEventListener('click', ()=> document.getElementById('postModal').classList.remove('hidden'));
+    document.getElementById('btnCancelPost').addEventListener('click', ()=> document.getElementById('postModal').classList.add('hidden'));
+    document.getElementById('btnSubmitPost').addEventListener('click', window.submitPostRequest);
   </script>
 </body>
 </html>
