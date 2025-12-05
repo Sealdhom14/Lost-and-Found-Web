@@ -1,0 +1,11 @@
+{
+  "name": "lost-found-web",
+  "version": "1.0.0",
+  "scripts": {
+    "create-admin": "node scripts/create_admin.js"
+  },
+  "dependencies": {
+    "firebase": "^12.6.0",
+    "firebase-admin": "^12.0.0"
+  }
+}
