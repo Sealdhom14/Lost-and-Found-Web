@@ -1,278 +1,44 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
 <head>
-  <title>Lost & Found | Login</title>
+  <meta charset="utf-8" />
+  <title>Lost & Found — Login</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="auth-card">
+    <h1>Lost & Found</h1>
+    <p class="small">Login to continue</p>
 
-  <!-- Firebase SDKs -->
+    <input id="loginEmail" type="email" placeholder="Email" />
+    <input id="loginPassword" type="password" placeholder="Password" />
+    <div class="row">
+      <button id="btnLogin">Login</button>
+      <a class="small right" href="register.html">Create account</a>
+    </div>
+
+    <p id="loginStatus" class="small"></p>
+  </div>
+
+  <!-- Firebase compat SDKs (must load before app scripts) -->
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script>
 
+  <!-- Your config -->
   <script src="firebase-config.js"></script>
 
-  <style>
-    body { font-family: Arial; padding: 20px; }
-    .box { border: 1px solid #ccc; padding: 20px; width: 300px; }
-    #registerBox { display: none; }
-  </style>
+  <!-- App logic -->
+  <script src="scripts/app.js"></script>
 
-</head>
-<body>
-
-<h2>Lost & Found System</h2>
-
-<!-- LOGIN BOX -->
-<div class="box" id="loginBox">
-  <h3>Login</h3>
-  <input type="email" id="loginEmail" placeholder="Email"><br><br>
-  <input type="password" id="loginPass" placeholder="Password"><br><br>
-  <button onclick="login()">Login</button><br><br>
-  <a href="#" onclick="showRegister()">Create Account</a>
-</div>
-
-<!-- REGISTER BOX -->
-<div class="box" id="registerBox">
-  <h3>Create Account Request</h3>
-
-  <input type="text" id="regName" placeholder="Full Name"><br><br>
-  <input type="text" id="regLocation" placeholder="Location"><br><br>
-  <input type="text" id="regContact" placeholder="Contact Number"><br><br>
-  <input type="email" id="regEmail" placeholder="Email"><br><br>
-  <input type="password" id="regPass" placeholder="Password"><br><br>
-
-  <button onclick="submitRequest()">Submit Request</button><br><br>
-  <a href="#" onclick="showLogin()">Back to Login</a>
-</div>
-
-<p id="status"></p>
-
-<script>
-function showRegister() {
-  document.getElementById("loginBox").style.display = "none";
-  document.getElementById("registerBox").style.display = "block";
-}
-
-function showLogin() {
-  document.getElementById("registerBox").style.display = "none";
-  document.getElementById("loginBox").style.display = "block";
-}
-
-/* --- Submit Account Activation Request --- */
-/* DOES NOT create Firebase Auth account yet */
-async function submitAccountRequest() {
-  const fullname = document.getElementById('reg-fullname').value.trim();
-  const email = document.getElementById('reg-email').value.trim();
-  const password = document.getElementById('reg-password').value;
-  const phone = document.getElementById('reg-phone').value;
-  const location = document.getElementById('reg-location').value;
-  const idFileInput = document.getElementById('reg-idfile');
-
-  if(!fullname || !email || !password) { alert('Fill required fields'); return; }
-
-  // upload ID image
-  let idUrl = '';
-  if(idFileInput.files && idFileInput.files[0]) {
-    const file = idFileInput.files[0];
-    const path = `account_ids/temp_${Date.now()}_${file.name}`;
-    const snap = await storage.ref(path).put(file);
-    idUrl = await snap.ref.getDownloadURL();
-  }
-
-  await db.collection('account_requests').add({
-    fullname, email, password, phone, location, idUrl,
-    status: 'pending',
-    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-  });
-
-  alert('Request submitted. Please wait for admin approval.');
-}
-/* --- LOGIN FUNCTION --- */
-function login() {
-  const email = document.getElementById("loginEmail").value;
-  const pass = document.getElementById("loginPass").value;
-
-  auth.signInWithEmailAndPassword(email, pass)
-  .then(() => {
-      // Check Firestore user role
-      db.collection("users")
-      .doc(auth.currentUser.uid)
-      .get()
-      .then(doc => {
-          if (!doc.exists) {
-              alert("Your account is not activated yet.");
-              auth.signOut();
-          } else {
-              if (doc.data().role === "admin") {
-                  window.location.href = "admin.html";
-              } else {
-                  window.location.href = "home.html";
-              }
-          }
-      });
-  })
-  .catch(err => alert(err.message));
-}
-
-
-async function submitPostRequest(type, text, fileInput) {
-  if(!auth.currentUser) { alert('Login first'); return; }
-  let imageUrl = '';
-  if(fileInput && fileInput.files && fileInput.files[0]) {
-    const file = fileInput.files[0];
-    const path = `post_images/${auth.currentUser.uid}/${Date.now()}_${file.name}`;
-    const snap = await storage.ref(path).put(file);
-    imageUrl = await snap.ref.getDownloadURL();
-  }
-
-  await db.collection('post_requests').add({
-    authorId: auth.currentUser.uid,
-    authorName: auth.currentUser.email,
-    type, text, imageUrl,
-    status: 'pending',
-    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-  });
-
-  alert('Post submitted for admin approval');
-}
-
-
-
-async function approveRequest(requestId) {
-  const reqDoc = await db.collection('account_requests').doc(requestId).get();
-  const data = reqDoc.data();
-  if(!data) return;
-
-  // Create auth user (admin action) — uses client SDK: createUserWithEmailAndPassword requires being logged as a privileged account.
-  // Usually you'd run this with Admin SDK on server. For small apps, admin page can create users if the admin is allowed.
-  try {
-    const cred = await auth.createUserWithEmailAndPassword(data.email, data.password);
-    const uid = cred.user.uid;
-    await db.collection('users').doc(uid).set({
-      fullname: data.fullname,
-      email: data.email,
-      role: 'user',
-      status: 'active',
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  <script>
+    // connect buttons to app.js functions
+    document.getElementById('btnLogin').addEventListener('click', () => {
+      const email = document.getElementById('loginEmail').value.trim();
+      const pass = document.getElementById('loginPassword').value;
+      login(email, pass);
     });
-    await db.collection('account_requests').doc(requestId).update({ status: 'approved' });
-    alert('User approved and account created.');
-  } catch (err) {
-    console.error(err);
-    alert('Error creating auth user: ' + err.message);
-  }
-
-
-
-
-  async function approvePostRequest(reqId) {
-  const doc = await db.collection('post_requests').doc(reqId).get();
-  if(!doc.exists) return;
-  const data = doc.data();
-
-  await db.collection('posts').add({
-    authorId: data.authorId,
-    authorName: data.authorName,
-    type: data.type,
-    text: data.text,
-    imageUrl: data.imageUrl || '',
-    status: 'approved',
-    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-  });
-
-  await db.collection('post_requests').doc(reqId).delete();
-  alert('Post approved');
-}
-}
-
-
-
-  db.collection('posts').where('status', '==', 'approved').orderBy('createdAt','desc')
-  .onSnapshot(snapshot => {
-    const lostEl = document.getElementById('lost-list');
-    const foundEl = document.getElementById('found-list');
-    lostEl.innerHTML = ''; foundEl.innerHTML = '';
-    snapshot.forEach(doc => {
-      const p = doc.data();
-      const div = document.createElement('div');
-      div.className = 'post-card';
-      div.innerHTML = `<strong>${p.authorName}</strong><p>${p.text}</p>`;
-      if(p.imageUrl) div.innerHTML += `<img src="${p.imageUrl}" style="max-width:100%" />`;
-
-      if(p.type === 'lost') lostEl.appendChild(div);
-      else foundEl.appendChild(div);
-    });
-});
-
-
-
-
-  await db.collection('posts').doc(postId).collection('comments').add({
-  authorId: auth.currentUser.uid,
-  authorName: auth.currentUser.displayName || auth.currentUser.email,
-  text: commentText,
-  createdAt: firebase.firestore.FieldValue.serverTimestamp()
-});
-
-
-
-
-
-  await db.collection('messages').add({
-  from: auth.currentUser.uid,
-  to: 'admin',  // or admin uid
-  text: 'I lost my phone',
-  createdAt: firebase.firestore.FieldValue.serverTimestamp()
-});
-
-
-
-
-
-  rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    // Allow read to posts for anyone
-    match /posts/{postId} {
-      allow read: if true;
-      allow create: if request.auth != null && request.resource.data.authorId == request.auth.uid;
-      allow update, delete: if request.auth != null && request.auth.uid == resource.data.authorId; // author can edit/delete
-    }
-
-    // Account requests: anyone can create a request, only admins can delete/approve
-    match /account_requests/{reqId} {
-      allow create: if true;
-      allow read, update, delete: if isAdmin();
-    }
-
-    match /post_requests/{reqId} {
-      allow create: if request.auth != null && request.resource.data.authorId == request.auth.uid;
-      allow read, update, delete: if isAdmin();
-    }
-
-    match /users/{userId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && request.auth.uid == userId || isAdmin();
-    }
-
-    match /messages/{msgId} {
-      allow create: if request.auth != null && request.resource.data.from == request.auth.uid;
-      allow read: if request.auth != null && (request.auth.uid == resource.data.from || request.auth.uid == resource.data.to || isAdmin());
-    }
-
-    match /notifications/{n} {
-      allow read: if request.auth != null;
-      allow create: if isAdmin();
-    }
-
-    function isAdmin() {
-      return exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
-    }
-  }
-}
-
-</script>
-
+  </script>
 </body>
 </html>
-
