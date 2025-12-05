@@ -5,9 +5,8 @@
     <title>Admin Dashboard</title>
     <link rel="stylesheet" href="../styles.css">
 
-    <!-- Firebase -->
-    <script type="module" src="./firebase-config.js"></script>
-    <script type="module" src="./scripts/admin.js"></script>
+    <script type="module" src="../firebase-config.js"></script>
+    <script type="module" src="../scripts/admin.js"></script>
 </head>
 
 <body>
@@ -19,31 +18,25 @@
     </div>
 
     <div class="layout">
-
-        <!-- LEFT COLUMN: Messages -->
         <div class="col small-col">
             <h3>Messages</h3>
             <div id="adminMessages"></div>
         </div>
 
-        <!-- CENTER COLUMN: Lost Items -->
         <div class="col main-col">
             <h3>Lost Items</h3>
             <div id="adminLostList">Loading...</div>
         </div>
 
-        <!-- CENTER COLUMN: Found Items -->
         <div class="col main-col">
             <h3>Found Items</h3>
             <div id="adminFoundList">Loading...</div>
         </div>
 
-        <!-- RIGHT COLUMN: Requests -->
         <div class="col small-col">
             <h3>Requests</h3>
             <div id="adminRequests">Loading...</div>
         </div>
-
     </div>
 
 </body>
