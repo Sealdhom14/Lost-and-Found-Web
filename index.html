@@ -127,57 +127,7 @@
   </div>
 
   <!-- Firebase compat SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script>
-
-
-  <!-- Your Firebase config (edit firebase-config.js instead if you prefer separate file) -->
-  <script src="firebase-config.js"></script>
-
-<script>
-function login() {
-    const email = document.getElementById("loginEmail").value;
-    const pass = document.getElementById("loginPass").value;
-
-    auth.signInWithEmailAndPassword(email, pass)
-        .then(() => {
-            db.collection("users")
-              .doc(auth.currentUser.uid)
-              .get()
-              .then(doc => {
-                 if (!doc.exists) {
-                    alert("Account not activated yet.");
-                 } else {
-                    if (doc.data().role === "admin") {
-                        window.location.href = "admin.html";
-                    } else {
-                        window.location.href = "home.html";
-                    }
-                 }
-              });
-        })
-        .catch(err => alert(err.message));
-}
-</script>
-
-  
-  <!-- Main logic -->
-  <script src="app.js"></script>
-
-</body>
-</html>
-
-
-
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Lost & Found | Login</title>
-
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+ <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
 
@@ -288,6 +238,12 @@ function login() {
   .catch(err => alert(err.message));
 }
 </script>
+  
+  <!-- Main logic -->
+  <script src="app.js"></script>
 
 </body>
 </html>
+
+
+
