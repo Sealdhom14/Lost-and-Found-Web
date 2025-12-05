@@ -1,30 +1,47 @@
-import { auth, db } from "./firebase.js";
-import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-import { setDoc, doc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { auth, db } from "../firebase-config.js";
+import { createUserWithEmailAndPassword } 
+  from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { doc, setDoc } 
+  from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } 
+  from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
-document.getElementById("registerForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
+const storage = getStorage();
 
-    const email = email.value;
-    const password = password.value;
-    const name = name.value;
+document.getElementById("btnCreate").addEventListener("click", async () => {
+
+    const fullname = regFullname.value.trim();
+    const location = regLocation.value.trim();
+    const phone = regPhone.value.trim();
+    const email = regEmail.value.trim();
+    const password = regPassword.value;
+    const idFile = regIdFile.files[0];
 
     try {
         const userCred = await createUserWithEmailAndPassword(auth, email, password);
-        const user = userCred.user;
+        const uid = userCred.user.uid;
 
-        await setDoc(doc(db, "users", user.uid), {
-            name,
+        let idUrl = null;
+        if (idFile) {
+            const storageRef = ref(storage, "ids/" + uid + ".jpg");
+            await uploadBytes(storageRef, idFile);
+            idUrl = await getDownloadURL(storageRef);
+        }
+
+        await setDoc(doc(db, "users", uid), {
+            fullname,
+            location,
+            phone,
             email,
+            idUrl,
             role: "user",
             status: "pending",
-            createdAt: Date.now()
+            createdAt: new Date()
         });
 
-        alert("Account created! Please wait for admin approval.");
-        window.location.href = "login.html";
+        regStatus.innerText = "Account created! Please wait for admin approval.";
 
-    } catch (err) {
-        alert(err.message);
+    } catch (e) {
+        regStatus.innerText = e.message;
     }
 });
