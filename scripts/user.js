@@ -1,3 +1,49 @@
+import { auth, db } from "../firebase-config.js";
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+auth.onAuthStateChanged(async (user) => {
+  if (!user) {
+    window.location.href = "../login.html";
+    return;
+  }
+
+  loadPosts();
+});
+
+async function loadPosts() {
+  const q = query(collection(db, "posts"), where("status", "==", "approved"));
+  const snapshot = await getDocs(q);
+
+  document.getElementById("lostItems").innerHTML = "";
+  document.getElementById("foundItems").innerHTML = "";
+
+  snapshot.forEach(doc => {
+    const post = doc.data();
+
+    const div = document.createElement("div");
+    div.className = "post";
+    div.innerHTML = `
+      <p>${post.text}</p>
+      ${post.imageUrl ? `<img src="${post.imageUrl}" />` : ""}
+    `;
+
+    if (post.type === "lost") {
+      document.getElementById("lostItems").appendChild(div);
+    } else {
+      document.getElementById("foundItems").appendChild(div);
+    }
+  });
+}
+
+window.logout = () => signOut(auth);
+
+
 firebase.auth().onAuthStateChanged(user => {
   if (!user) {
     window.location.href = "../login.html";
