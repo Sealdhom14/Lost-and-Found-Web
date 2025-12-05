@@ -1,5 +1,35 @@
 // firebase-config.js
 // <-- REPLACE the values below with your Firebase project's config -->
+// firebase-config.js
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import {
+  getAuth,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut,
+  createUserWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  addDoc,
+  deleteDoc,
+  getDocs,
+  collection,
+  query,
+  orderBy,
+  where,
+  onSnapshot,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// -------------------------------------
+// 🔥 Your Firebase Config
+// -------------------------------------
 const firebaseConfig = {
   apiKey: "AIzaSyCV5PSuNQ_dyQmXst5-Fsx4OoZu3XdcXNk",
   authDomain: "lostfoundweb-9c840.firebaseapp.com",
@@ -9,61 +39,31 @@ const firebaseConfig = {
   appId: "1:55877475800:web:247e5c96009a1ea9c5e6ad"
 };
 
-// Initialize Firebase (compat)
-firebase.initializeApp(firebaseConfig);
 
-// Make global references that other scripts use
-window.auth = firebase.auth();
-window.db = firebase.firestore();
-window.storage = firebase.storage();
+// Initialize
+const app = initializeApp(firebaseConfig);
 
-
-// firebase-config.js
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import {
-  getAuth,
-  onAuthStateChanged,
-  signOut
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-import {
-  getFirestore,
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  setDoc,
-  updateDoc,
-  addDoc,
-  deleteDoc,
-  serverTimestamp,
-  query,
-  where,
-  orderBy,
-  onSnapshot
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-export const app = initializeApp(firebaseConfig);
+// Export Firebase services
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 
+// Export helpers
 export {
   onAuthStateChanged,
+  signInWithEmailAndPassword,
   signOut,
-  collection,
+  createUserWithEmailAndPassword,
   doc,
   getDoc,
-  getDocs,
   setDoc,
   updateDoc,
   addDoc,
   deleteDoc,
-  serverTimestamp,
+  getDocs,
+  collection,
   query,
-  where,
   orderBy,
-  onSnapshot
+  where,
+  onSnapshot,
+  serverTimestamp
 };
-
-
