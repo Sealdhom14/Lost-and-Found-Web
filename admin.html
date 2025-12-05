@@ -18,15 +18,76 @@
     <p><a href="index.html">Back to main</a></p>
   </div>
 
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+ <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script>
+
   <script src="firebase-config.js"></script>
-  <script src="app.js"></script>
-  <script>
-    // admin.html uses the same app.js listeners; admin UI content
-    // admin-specific rendering is handled by app.js when role === 'admin'
-  </script>
+</head>
+<body>
+
+<h2>Admin Dashboard</h2>
+<button onclick="logout()">Logout</button>
+
+<h3>Pending Account Requests</h3>
+<div id="requests"></div>
+
+<script>
+// Load account requests
+db.collection("account_requests")
+  .where("status", "==", "pending")
+  .onSnapshot(snapshot => {
+    let output = "";
+    snapshot.forEach(doc => {
+      const req = doc.data();
+
+      output += `
+        <div style="border:1px solid #ccc; padding:10px; margin:10px;">
+          <b>${req.name}</b><br>
+          ${req.email}<br>
+          ${req.location}<br>
+          ${req.contact}<br><br>
+          <button onclick="approve('${doc.id}', '${req.email}', '${req.password}', '${req.name}')">
+            Approve
+          </button>
+          <button onclick="decline('${doc.id}')">Decline</button>
+        </div>
+      `;
+    });
+
+    document.getElementById("requests").innerHTML = output;
+  });
+
+// Approve user
+function approve(id, email, pass, name) {
+  auth.createUserWithEmailAndPassword(email, pass)
+  .then(user => {
+    const uid = user.user.uid;
+
+    // Add to users collection
+    db.collection("users").doc(uid).set({
+      name: name,
+      email: email,
+      role: "user",
+      status: "approved"
+    });
+
+    // Update request status
+    db.collection("account_requests").doc(id).update({
+      status: "approved"
+    });
+  });
+}
+
+function decline(id) {
+  db.collection("account_requests").doc(id).delete();
+}
+
+function logout() {
+  auth.signOut().then(() => {
+    window.location.href = "index.html";
+  });
+}
+</script>
 </body>
 </html>
