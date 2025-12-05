@@ -6,8 +6,10 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+
   <div class="auth-card">
     <h2>Create Account</h2>
+
     <input id="regFullname" placeholder="Full name">
     <input id="regLocation" placeholder="Location">
     <input id="regPhone" placeholder="Contact number">
@@ -18,39 +20,14 @@
 
     <div style="display:flex;gap:8px;align-items:center">
       <button id="btnCreate">Create account</button>
-      <a class="small" href="index.html">Back to Login</a>
+      <a class="small" href="login.html">Back to Login</a>
     </div>
+
     <p id="regStatus" class="small"></p>
-    <p class="small">After creating an account, log in and click Request Activation inside your profile (we will add that button in dashboard).</p>
   </div>
 
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script>
-
-  <script src="./firebase-config.js"></script>
-  <script src="./scripts/app.js"></script>
-
-  <script>
-    document.getElementById('btnCreate').addEventListener('click', async () => {
-      const fullname = document.getElementById('regFullname').value.trim();
-      const location = document.getElementById('regLocation').value.trim();
-      const phone = document.getElementById('regPhone').value.trim();
-      const email = document.getElementById('regEmail').value.trim();
-      const password = document.getElementById('regPassword').value;
-      const idFile = document.getElementById('regIdFile').files[0];
-
-      try {
-        await window.registerAndCreateUser({ fullname, location, phone, email, password, idFile });
-        document.getElementById('regStatus').innerText = 'Account created. Log in, then click Request Activation.';
-      } catch (e) {
-        document.getElementById('regStatus').innerText = e.message;
-      }
-    });
-  </script>
+  <!-- Modular Firebase -->
+  <script type="module" src="./firebase-config.js"></script>
+  <script type="module" src="./scripts/register.js"></script>
 </body>
 </html>
-
-
