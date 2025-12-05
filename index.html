@@ -59,35 +59,33 @@ function showLogin() {
 
 /* --- Submit Account Activation Request --- */
 /* DOES NOT create Firebase Auth account yet */
-function submitRequest() {
-  const name = document.getElementById("regName").value;
-  const location = document.getElementById("regLocation").value;
-  const contact = document.getElementById("regContact").value;
-  const email = document.getElementById("regEmail").value;
-  const pass = document.getElementById("regPass").value;
+async function submitAccountRequest() {
+  const fullname = document.getElementById('reg-fullname').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const password = document.getElementById('reg-password').value;
+  const phone = document.getElementById('reg-phone').value;
+  const location = document.getElementById('reg-location').value;
+  const idFileInput = document.getElementById('reg-idfile');
 
-  if (!email || !pass || !name || !location || !contact) {
-    document.getElementById("status").innerText = "Please fill all fields.";
-    return;
+  if(!fullname || !email || !password) { alert('Fill required fields'); return; }
+
+  // upload ID image
+  let idUrl = '';
+  if(idFileInput.files && idFileInput.files[0]) {
+    const file = idFileInput.files[0];
+    const path = `account_ids/temp_${Date.now()}_${file.name}`;
+    const snap = await storage.ref(path).put(file);
+    idUrl = await snap.ref.getDownloadURL();
   }
 
-  // Create pending request
-  db.collection("account_requests").add({
-    name: name,
-    location: location,
-    contact: contact,
-    email: email,
-    password: pass,   // stored temporarily; admin will use this to create the real Auth account
-    status: "pending",
-    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-  })
-  .then(() => {
-    document.getElementById("status").innerText = 
-      "Request submitted! Please wait for admin approval.";
-    showLogin();
+  await db.collection('account_requests').add({
+    fullname, email, password, phone, location, idUrl,
+    status: 'pending',
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
   });
-}
 
+  alert('Request submitted. Please wait for admin approval.');
+}
 /* --- LOGIN FUNCTION --- */
 function login() {
   const email = document.getElementById("loginEmail").value;
@@ -114,7 +112,167 @@ function login() {
   })
   .catch(err => alert(err.message));
 }
+
+
+async function submitPostRequest(type, text, fileInput) {
+  if(!auth.currentUser) { alert('Login first'); return; }
+  let imageUrl = '';
+  if(fileInput && fileInput.files && fileInput.files[0]) {
+    const file = fileInput.files[0];
+    const path = `post_images/${auth.currentUser.uid}/${Date.now()}_${file.name}`;
+    const snap = await storage.ref(path).put(file);
+    imageUrl = await snap.ref.getDownloadURL();
+  }
+
+  await db.collection('post_requests').add({
+    authorId: auth.currentUser.uid,
+    authorName: auth.currentUser.email,
+    type, text, imageUrl,
+    status: 'pending',
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+
+  alert('Post submitted for admin approval');
+}
+
+
+
+async function approveRequest(requestId) {
+  const reqDoc = await db.collection('account_requests').doc(requestId).get();
+  const data = reqDoc.data();
+  if(!data) return;
+
+  // Create auth user (admin action) — uses client SDK: createUserWithEmailAndPassword requires being logged as a privileged account.
+  // Usually you'd run this with Admin SDK on server. For small apps, admin page can create users if the admin is allowed.
+  try {
+    const cred = await auth.createUserWithEmailAndPassword(data.email, data.password);
+    const uid = cred.user.uid;
+    await db.collection('users').doc(uid).set({
+      fullname: data.fullname,
+      email: data.email,
+      role: 'user',
+      status: 'active',
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    await db.collection('account_requests').doc(requestId).update({ status: 'approved' });
+    alert('User approved and account created.');
+  } catch (err) {
+    console.error(err);
+    alert('Error creating auth user: ' + err.message);
+  }
+
+
+
+
+  async function approvePostRequest(reqId) {
+  const doc = await db.collection('post_requests').doc(reqId).get();
+  if(!doc.exists) return;
+  const data = doc.data();
+
+  await db.collection('posts').add({
+    authorId: data.authorId,
+    authorName: data.authorName,
+    type: data.type,
+    text: data.text,
+    imageUrl: data.imageUrl || '',
+    status: 'approved',
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+
+  await db.collection('post_requests').doc(reqId).delete();
+  alert('Post approved');
+}
+}
+
+
+
+  db.collection('posts').where('status', '==', 'approved').orderBy('createdAt','desc')
+  .onSnapshot(snapshot => {
+    const lostEl = document.getElementById('lost-list');
+    const foundEl = document.getElementById('found-list');
+    lostEl.innerHTML = ''; foundEl.innerHTML = '';
+    snapshot.forEach(doc => {
+      const p = doc.data();
+      const div = document.createElement('div');
+      div.className = 'post-card';
+      div.innerHTML = `<strong>${p.authorName}</strong><p>${p.text}</p>`;
+      if(p.imageUrl) div.innerHTML += `<img src="${p.imageUrl}" style="max-width:100%" />`;
+
+      if(p.type === 'lost') lostEl.appendChild(div);
+      else foundEl.appendChild(div);
+    });
+});
+
+
+
+
+  await db.collection('posts').doc(postId).collection('comments').add({
+  authorId: auth.currentUser.uid,
+  authorName: auth.currentUser.displayName || auth.currentUser.email,
+  text: commentText,
+  createdAt: firebase.firestore.FieldValue.serverTimestamp()
+});
+
+
+
+
+
+  await db.collection('messages').add({
+  from: auth.currentUser.uid,
+  to: 'admin',  // or admin uid
+  text: 'I lost my phone',
+  createdAt: firebase.firestore.FieldValue.serverTimestamp()
+});
+
+
+
+
+
+  rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow read to posts for anyone
+    match /posts/{postId} {
+      allow read: if true;
+      allow create: if request.auth != null && request.resource.data.authorId == request.auth.uid;
+      allow update, delete: if request.auth != null && request.auth.uid == resource.data.authorId; // author can edit/delete
+    }
+
+    // Account requests: anyone can create a request, only admins can delete/approve
+    match /account_requests/{reqId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    match /post_requests/{reqId} {
+      allow create: if request.auth != null && request.resource.data.authorId == request.auth.uid;
+      allow read, update, delete: if isAdmin();
+    }
+
+    match /users/{userId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == userId || isAdmin();
+    }
+
+    match /messages/{msgId} {
+      allow create: if request.auth != null && request.resource.data.from == request.auth.uid;
+      allow read: if request.auth != null && (request.auth.uid == resource.data.from || request.auth.uid == resource.data.to || isAdmin());
+    }
+
+    match /notifications/{n} {
+      allow read: if request.auth != null;
+      allow create: if isAdmin();
+    }
+
+    function isAdmin() {
+      return exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+  }
+}
+
 </script>
 
 </body>
 </html>
+
