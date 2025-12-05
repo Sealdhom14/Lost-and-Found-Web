@@ -9,9 +9,13 @@ const firebaseConfig = {
   appId: "1:55877475800:web:80a3f984104fd495c5e6ad"
 };
 
-firebase.initializeApp(firebaseConfig);
+  // Initialize (compat)
+  firebase.initializeApp(firebaseConfig);
+
+  // Expose globals that the app uses
   window.auth = firebase.auth();
   window.db = firebase.firestore();
   window.storage = firebase.storage();
 </script>
+
 
