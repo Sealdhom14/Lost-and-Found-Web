@@ -1,3 +1,4 @@
+<script>
 // Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyCV5PSuNQ_dyQmXst5-Fsx4OoZu3XdcXNk",
@@ -8,9 +9,9 @@ const firebaseConfig = {
   appId: "1:55877475800:web:80a3f984104fd495c5e6ad"
 };
 
-// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
+  window.auth = firebase.auth();
+  window.db = firebase.firestore();
+  window.storage = firebase.storage();
+</script>
 
-// Expose to global
-window.auth = firebase.auth();
-window.db = firebase.firestore();
