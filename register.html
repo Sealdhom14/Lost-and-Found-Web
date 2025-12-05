@@ -43,5 +43,30 @@ document.getElementById('registerBtn').addEventListener('click', async function(
 });
 </script>
 
+  <script>
+function register() {
+    const email = document.getElementById("email").value;
+    const pass = document.getElementById("password").value;
+
+    auth.createUserWithEmailAndPassword(email, pass)
+    .then((userCred) => {
+        const uid = userCred.user.uid;
+
+        return db.collection("users").doc(uid).set({
+            email: email,
+            role: "pending",
+            status: "waiting_for_approval"
+        });
+    })
+    .then(() => {
+        alert("Registered! Wait for admin activation.");
+        window.location.href = "index.html";
+    })
+    .catch(err => alert(err.message));
+}
+</script>
+
+
 </body>
 </html>
+
