@@ -15,7 +15,7 @@ import {
   where,
   orderBy,
   onSnapshot
-} from "../firebase-config.js";
+} from "./firebase-config.js";
 
 // ---------------- AUTH -----------------
 
