@@ -1,120 +1,120 @@
-firebase.auth().onAuthStateChanged(user => {
-  if (!user) {
-    window.location.href = "../login.html";
-  } else {
-    loadAccountRequests();
-    loadPostRequests();
-    loadApprovedPosts();
+// scripts/admin.js
+auth.onAuthStateChanged(async (user) => {
+  if (!user) { window.location.href = '/index.html'; return; }
+  // check role
+  const ud = await db.collection('users').doc(user.uid).get();
+  const data = ud.exists ? ud.data() : {};
+  document.getElementById('adminLabel').innerText = data.fullname ? `${data.fullname} • admin` : user.email;
+  if (data.role !== 'admin') {
+    alert('Not an admin account');
+    auth.signOut();
+    return;
   }
+
+  loadAccountRequests();
+  loadPostRequests();
+  startListeningApprovedPosts();
+  startListeningNotifications();
+  startListeningMessages();
 });
 
-// LOGOUT
-function logout() {
-  firebase.auth().signOut().then(() => {
-    window.location.href = "../login.html";
-  });
-}
-
-// LOAD ACCOUNT REQUESTS
-function loadAccountRequests() {
-  db.collection("account_requests").onSnapshot(snapshot => {
-    const container = document.getElementById("accountRequests");
-    container.innerHTML = "";
-
-    snapshot.forEach(doc => {
-      const data = doc.data();
-
-      const div = document.createElement("div");
-      div.className = "request-card";
-      div.innerHTML = `
-        <p><b>${data.email}</b></p>
-        <button onclick="approveAccount('${doc.id}', '${data.uid}')">Approve</button>
-        <button onclick="declineAccount('${doc.id}')">Decline</button>
-      `;
-
-      container.appendChild(div);
+// Account requests
+function loadAccountRequests(){
+  db.collection('users').where('status','==','registered').onSnapshot(snap=>{
+    const el = document.getElementById('accountRequests');
+    el.innerHTML = '';
+    snap.forEach(doc=>{
+      const d = doc.data();
+      const div = document.createElement('div'); div.className='req-card';
+      div.innerHTML = `<div><b>${d.fullname || d.email}</b><div class="small">${d.email}</div></div>
+                       <div class="req-actions">
+                         <button onclick="approveUser('${doc.id}')">Approve</button>
+                         <button onclick="declineUser('${doc.id}')">Decline</button>
+                       </div>`;
+      el.appendChild(div);
     });
   });
 }
 
-// APPROVE ACCOUNT
-function approveAccount(requestId, uid) {
-  db.collection("users").doc(uid).set({
-    role: "user",
-    activated: true
-  });
-
-  db.collection("account_requests").doc(requestId).delete();
+async function approveUser(uid){
+  // set user's status active
+  await db.collection('users').doc(uid).update({ status: 'active' });
+  await db.collection('notifications').add({ type:'account_approved', userId: uid, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+  alert('User approved');
 }
 
-// DECLINE ACCOUNT
-function declineAccount(requestId) {
-  db.collection("account_requests").doc(requestId).delete();
+async function declineUser(uid){
+  await db.collection('users').doc(uid).update({ status: 'declined' });
+  alert('User declined');
 }
 
-// LOAD POST REQUESTS
-function loadPostRequests() {
-  db.collection("post_requests").onSnapshot(snapshot => {
-    const container = document.getElementById("postRequests");
-    container.innerHTML = "";
-
-    snapshot.forEach(doc => {
-      const data = doc.data();
-
-      const div = document.createElement("div");
-      div.className = "request-card";
-      div.innerHTML = `
-        <p>${data.text}</p>
-        <p>Type: ${data.type}</p>
-        <button onclick="approvePost('${doc.id}')">Approve</button>
-        <button onclick="declinePost('${doc.id}')">Decline</button>
-      `;
-
-      container.appendChild(div);
+// Post requests
+function loadPostRequests(){
+  db.collection('post_requests').orderBy('createdAt','desc').onSnapshot(snap=>{
+    const el = document.getElementById('postRequests');
+    el.innerHTML = '';
+    snap.forEach(doc=>{
+      const d = doc.data();
+      const div = document.createElement('div'); div.className='req-card';
+      div.innerHTML = `<div>${escapeHtml(d.text)}</div>
+                       <div class="small">By: ${d.authorName}</div>
+                       <div class="req-actions">
+                         <button onclick="approvePost('${doc.id}')">Approve</button>
+                         <button onclick="declinePost('${doc.id}')">Decline</button>
+                       </div>`;
+      el.appendChild(div);
     });
   });
 }
 
-// APPROVE POST
-function approvePost(postId) {
-  db.collection("post_requests").doc(postId).get().then(doc => {
-    const data = doc.data();
-
-    db.collection("posts").add({
-      text: data.text,
-      type: data.type,
-      uid: data.uid,
-      created: firebase.firestore.FieldValue.serverTimestamp()
-    });
-
-    db.collection("post_requests").doc(postId).delete();
+async function approvePost(reqId){
+  const snap = await db.collection('post_requests').doc(reqId).get();
+  if(!snap.exists) return;
+  const d = snap.data();
+  await db.collection('posts').add({
+    authorId: d.authorId, authorName: d.authorName, type: d.type, text: d.text, imageUrl: d.imageUrl || '',
+    status: 'approved', createdAt: firebase.firestore.FieldValue.serverTimestamp()
   });
+  await db.collection('post_requests').doc(reqId).delete();
+  await db.collection('notifications').add({ type: 'post_approved', postRequestId: reqId, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+  alert('Post approved');
 }
 
-// DECLINE POST
-function declinePost(postId) {
-  db.collection("post_requests").doc(postId).delete();
+async function declinePost(reqId){
+  await db.collection('post_requests').doc(reqId).delete();
+  alert('Post declined');
 }
 
-// LOAD APPROVED POSTS FOR ADMIN VIEW
-function loadApprovedPosts() {
-  db.collection("posts").orderBy("created", "desc")
-    .onSnapshot(snapshot => {
-
-    const lost = document.getElementById("lostPostsAdmin");
-    const found = document.getElementById("foundPostsAdmin");
-
-    lost.innerHTML = "";
-    found.innerHTML = "";
-
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      const div = document.createElement("div");
-      div.className = "post-card";
-      div.innerText = data.text;
-
-      if (data.type === "lost") lost.appendChild(div);
-      else found.appendChild(div);
+// Approved posts for admin view
+function startListeningApprovedPosts(){
+  db.collection('posts').orderBy('createdAt','desc').onSnapshot(snap=>{
+    const lostEl = document.getElementById('adminLostList');
+    const foundEl = document.getElementById('adminFoundList');
+    lostEl.innerHTML=''; foundEl.innerHTML='';
+    snap.forEach(doc=>{
+      const p = doc.data();
+      const el = document.createElement('div'); el.className='post-card';
+      el.innerHTML = `<div class="meta"><strong>${p.authorName}</strong> • ${new Date(p.createdAt?.seconds*1000 || Date.now()).toLocaleString()}</div>
+                      <div class="text">${escapeHtml(p.text)}</div>`;
+      if (p.type === 'lost') lostEl.appendChild(el); else foundEl.appendChild(el);
     });
   });
 }
+
+// Notifications & messages
+function startListeningNotifications(){
+  db.collection('notifications').orderBy('createdAt','desc').limit(50).onSnapshot(snap=>{
+    const el = document.getElementById('adminNotifications'); el.innerHTML='';
+    snap.forEach(d=>{ const x=d.data(); const div=document.createElement('div'); div.className='req-card'; div.innerText = `${x.type} ${x.userId? ' • '+x.userId : ''}`; el.appendChild(div) });
+  });
+}
+
+function startListeningMessages(){
+  db.collection('messages').orderBy('createdAt','desc').onSnapshot(snap=>{
+    const el=document.getElementById('adminMessages'); el.innerHTML='';
+    snap.forEach(d=>{ const x=d.data(); const div=document.createElement('div'); div.className='msg-item'; div.innerHTML=`<div class="msg-from">${x.from}</div><div>${x.text}</div>`; el.appendChild(div); });
+  });
+}
+
+// small helper
+function escapeHtml(s){ return s ? s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : ''; }
