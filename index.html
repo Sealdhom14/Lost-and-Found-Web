@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Lost & Found Portal</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="root">
+
+    <!-- AUTH AREA -->
+    <div id="auth-area" class="card">
+      <h1>Lost & Found Portal</h1>
+
+      <div id="register-block">
+        <h3>Sign up</h3>
+        <input id="reg-fullname" placeholder="Full name" />
+        <input id="reg-location" placeholder="Location" />
+        <input id="reg-phone" placeholder="Contact number" />
+        <input id="reg-email" type="email" placeholder="Email" />
+        <input id="reg-password" type="password" placeholder="Password" />
+        <label>ID image (photo of valid ID)</label>
+        <input id="reg-idfile" type="file" accept="image/*" />
+        <button id="btn-register">Create account</button>
+        <button id="btn-request-activation" style="display:none;">Request Account Activation</button>
+      </div>
+
+      <hr>
+
+      <div id="login-block">
+        <h3>Login</h3>
+        <input id="login-email" type="email" placeholder="Email" />
+        <input id="login-password" type="password" placeholder="Password" />
+        <button id="btn-login">Login</button>
+      </div>
+    </div>
+
+    <!-- MAIN APP -->
+    <div id="app-area" style="display:none;">
+      <header class="topbar">
+        <div>
+          <strong id="user-name">Guest</strong>
+          <span id="user-role"></span>
+        </div>
+        <div>
+          <button id="btn-logout">Logout</button>
+        </div>
+      </header>
+
+      <main class="grid">
+        <aside class="col messages-col">
+          <h4>Messages</h4>
+          <div id="messages-list" class="list"></div>
+          <div id="message-compose" style="display:none;">
+            <textarea id="message-text" placeholder="Message to admin"></textarea>
+            <button id="btn-send-message">Send</button>
+          </div>
+        </aside>
+
+        <section class="col main-col">
+          <div class="col-header">
+            <h3>Lost Items</h3>
+            <button id="btn-new-post">Create Post</button>
+          </div>
+          <div id="lost-list" class="post-list"></div>
+        </section>
+
+        <section class="col main-col">
+          <h3>Found Items</h3>
+          <div id="found-list" class="post-list"></div>
+        </section>
+
+        <aside class="col notify-col">
+          <h4>Notifications</h4>
+          <div id="notifications" class="list"></div>
+        </aside>
+
+        <aside id="admin-col" class="col admin-col" style="display:none;">
+          <h4>Admin - Requests</h4>
+
+          <h5>Account Activation Requests</h5>
+          <div id="account-requests" class="list"></div>
+
+          <h5>Post Approval Requests</h5>
+          <div id="post-requests" class="list"></div>
+        </aside>
+      </main>
+
+      <div id="create-post-panel" class="card modal" style="display:none;">
+        <h4>Create Post</h4>
+        <select id="post-type">
+          <option value="lost">Lost</option>
+          <option value="found">Found</option>
+        </select>
+        <textarea id="post-text" placeholder="Describe item..."></textarea>
+        <input id="post-image" type="file" accept="image/*" />
+        <button id="btn-submit-post">Submit (Request approval)</button>
+        <button id="btn-cancel-post">Cancel</button>
+      </div>
+    </div>
+
+    <template id="post-template">
+      <div class="post">
+        <div class="post-head"><strong class="p-author"></strong> <span class="p-time"></span></div>
+        <div class="p-body"></div>
+        <div class="p-image"></div>
+        <div class="p-actions">
+          <button class="btn-comment">Comment</button>
+          <button class="btn-mention">@</button>
+        </div>
+        <div class="comments"></div>
+        <div class="add-comment" style="display:none;">
+          <input class="comment-text" placeholder="Write comment..." />
+          <button class="btn-post-comment">Post</button>
+        </div>
+      </div>
+    </template>
+
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script>
+
+  <!-- FIREBASE CONFIG -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCV5PSuNQ_dyQmXst5-Fsx4OoZu3XdcXNk",
+      authDomain: "lostfoundweb-9c840.firebaseapp.com",
+      projectId: "lostfoundweb-9c840",
+      storageBucket: "lostfoundweb-9c840.appspot.com",
+      messagingSenderId: "55877475800",
+      appId: "1:55877475800:web:247e5c96009a1ea9c5e6ad"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const storage = firebase.storage();
+  </script>
+
+  <!-- MAIN APP LOGIC -->
+  <script src="app.js"></script>
+
+</body>
+</html>

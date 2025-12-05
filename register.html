@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Register</title>
+
+  <!-- Firebase compat scripts -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+
+  <!-- Your Firebase config -->
+  <script src="firebase-config.js"></script>
+</head>
+<body>
+
+<h2>Create Account</h2>
+
+<input type="text" id="fullname" placeholder="Full Name"><br><br>
+<input type="text" id="location" placeholder="Location"><br><br>
+<input type="text" id="phone" placeholder="Phone Number"><br><br>
+<input type="email" id="email" placeholder="Email"><br><br>
+<input type="password" id="password" placeholder="Password"><br><br>
+<label>Upload ID:</label>
+<input type="file" id="idfile" accept="image/*"><br><br>
+
+<button onclick="register()">Register</button>
+
+<p><a href="index.html">Back to Login</a></p>
+
+<script>
+function register() {
+  const fullname = document.getElementById("fullname").value.trim();
+  const locationVal = document.getElementById("location").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const idFile = document.getElementById("idfile").files[0];
+
+  if (!fullname || !locationVal || !phone || !email || !password || !idFile) {
+    alert("Please complete all fields and upload your ID.");
+    return;
+  }
+
+  auth.createUserWithEmailAndPassword(email, password)
+    .then(cred => {
+      const uid = cred.user.uid;
+
+      // Upload ID image
+      const storageRef = firebase.storage().ref();
+      const fileRef = storageRef.child(`ids/${uid}.jpg`);
+      return fileRef.put(idFile)
+        .then(() => fileRef.getDownloadURL())
+        .then(idURL => {
+          // Save user profile in Firestore
+          return db.collection("users").doc(uid).set({
+            fullname,
+            location: locationVal,
+            phone,
+            email,
+            idURL,
+            role: "pending",        // waiting for admin approval
+            createdAt: Date.now()
+          });
+        });
+    })
+    .then(() => {
+      alert("Account created successfully! Waiting for admin approval.");
+      window.location.href = "index.html";
+    })
+    .catch(err => {
+      alert("Error: " + err.message);
+    });
+}
+</script>
+
+</body>
+</html>
