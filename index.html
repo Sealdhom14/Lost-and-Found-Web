@@ -33,10 +33,11 @@
         <input id="login-email" type="email" placeholder="Email" />
         <input id="login-password" type="password" placeholder="Password" />
         <button id="btn-login">Login</button>
+        <p>or <a href="register.html">Register a new account</a></p>
       </div>
     </div>
 
-    <!-- MAIN APP -->
+    <!-- MAIN APP (hidden until login) -->
     <div id="app-area" style="display:none;">
       <header class="topbar">
         <div>
@@ -49,15 +50,18 @@
       </header>
 
       <main class="grid">
+        <!-- Left small column: Messages -->
         <aside class="col messages-col">
           <h4>Messages</h4>
           <div id="messages-list" class="list"></div>
+
           <div id="message-compose" style="display:none;">
             <textarea id="message-text" placeholder="Message to admin"></textarea>
             <button id="btn-send-message">Send</button>
           </div>
         </aside>
 
+        <!-- Main two large columns -->
         <section class="col main-col">
           <div class="col-header">
             <h3>Lost Items</h3>
@@ -71,11 +75,13 @@
           <div id="found-list" class="post-list"></div>
         </section>
 
+        <!-- Right small column: Notifications -->
         <aside class="col notify-col">
           <h4>Notifications</h4>
           <div id="notifications" class="list"></div>
         </aside>
 
+        <!-- Admin-only column: Requests -->
         <aside id="admin-col" class="col admin-col" style="display:none;">
           <h4>Admin - Requests</h4>
 
@@ -87,6 +93,7 @@
         </aside>
       </main>
 
+      <!-- Create Post Modal (simple inline) -->
       <div id="create-post-panel" class="card modal" style="display:none;">
         <h4>Create Post</h4>
         <select id="post-type">
@@ -119,30 +126,16 @@
 
   </div>
 
-  <!-- Firebase SDKs -->
+  <!-- Firebase compat SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script>
 
-  <!-- FIREBASE CONFIG -->
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyCV5PSuNQ_dyQmXst5-Fsx4OoZu3XdcXNk",
-      authDomain: "lostfoundweb-9c840.firebaseapp.com",
-      projectId: "lostfoundweb-9c840",
-      storageBucket: "lostfoundweb-9c840.appspot.com",
-      messagingSenderId: "55877475800",
-      appId: "1:55877475800:web:247e5c96009a1ea9c5e6ad"
-    };
+  <!-- Your Firebase config (edit firebase-config.js instead if you prefer separate file) -->
+  <script src="firebase-config.js"></script>
 
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    const storage = firebase.storage();
-  </script>
-
-  <!-- MAIN APP LOGIC -->
+  <!-- Main logic -->
   <script src="app.js"></script>
 
 </body>
