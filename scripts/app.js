@@ -1,15 +1,13 @@
-// scripts/app.js - core app functions (compat mode)
-// Must be loaded AFTER firebase-config.js
+// scripts/app.js
+// NOTE: must be loaded after firebase-config.js
 
-// Register and create firebase auth user, then create users doc with status 'registered'
+// Create a new user (register) and create a users doc with status 'registered'
 async function registerAndCreateUser({ fullname, location, phone, email, password, idFile }) {
-  if (!email || !password || !fullname) throw new Error('Fullname, email, password required.');
+  if (!email || !password || !fullname) throw new Error('Name, email and password required.');
 
-  // create auth user
   const cred = await auth.createUserWithEmailAndPassword(email, password);
   const uid = cred.user.uid;
 
-  // upload ID if provided
   let idUrl = '';
   if (idFile) {
     const path = `id_uploads/${uid}/${Date.now()}_${idFile.name}`;
@@ -17,7 +15,6 @@ async function registerAndCreateUser({ fullname, location, phone, email, passwor
     idUrl = await snap.ref.getDownloadURL();
   }
 
-  // create users doc with status 'registered' (not active until admin approves)
   await db.collection('users').doc(uid).set({
     fullname, location, phone, email, idUrl,
     role: 'user',
@@ -28,54 +25,44 @@ async function registerAndCreateUser({ fullname, location, phone, email, passwor
   return uid;
 }
 
-// Login but block access unless user.status === 'active'
+// Login and redirect based on role and active status
 async function login(email, password) {
-  const statusEl = document.getElementById('loginStatus');
   try {
     await auth.signInWithEmailAndPassword(email, password);
-    // check user's Firestore doc
     const uid = auth.currentUser.uid;
-    const doc = await db.collection('users').doc(uid).get();
-    if (!doc.exists) {
+    const ud = await db.collection('users').doc(uid).get();
+    if (!ud.exists) {
       await auth.signOut();
-      if (statusEl) statusEl.innerText = 'Your account is not activated (no user record).';
+      alert('Your account has not been activated by admin yet.');
       return;
     }
-    const data = doc.data();
+    const data = ud.data();
     if (data.status !== 'active') {
       await auth.signOut();
-      if (statusEl) statusEl.innerText = 'Your account is not active yet. Please request activation or wait for admin.';
+      alert('Your account status: ' + data.status + '. Please wait for admin approval.');
       return;
     }
-    // redirect by role
-    if (data.role === 'admin') window.location.href = 'admin/dashboard.html';
-    else window.location.href = 'user/dashboard.html';
+    if (data.role === 'admin') window.location = 'admin-dashboard.html';
+    else window.location = 'user-dashboard.html';
   } catch (err) {
-    if (statusEl) statusEl.innerText = err.message;
-    else alert(err.message);
+    alert(err.message);
   }
 }
 
-// Request activation: user must be logged in, will set 'status' -> 'pending'
+// Request activation (user must be logged in)
 async function requestActivation() {
   const user = auth.currentUser;
-  if (!user) throw new Error('You must log in first to request activation.');
+  if (!user) throw new Error('Login first to request activation.');
   await db.collection('users').doc(user.uid).update({ status: 'pending' });
-  // add a notification for admin (simple)
-  await db.collection('notifications').add({
-    type: 'account_request',
-    userId: user.uid,
-    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-  });
-  return true;
+  await db.collection('notifications').add({ type: 'account_request', userId: user.uid, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
 }
 
-// Logout helper
+// Logout
 function logout() {
-  auth.signOut().then(()=> window.location.href = '/');
+  auth.signOut().then(()=> window.location = '/');
 }
 
-// Expose helpers to window so inline scripts can call them
+// Expose to window
 window.registerAndCreateUser = registerAndCreateUser;
 window.login = login;
 window.requestActivation = requestActivation;
