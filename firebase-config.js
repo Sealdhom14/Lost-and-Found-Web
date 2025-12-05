@@ -1,7 +1,7 @@
 <script>
-// Firebase configuration
+// Firebase config
 const firebaseConfig = {
-  apiKey: "AIzaSyCV5PSuNQ_dyQmXst5-Fsx4OoZu3XdcXNk",
+  apiKey: "YOUR-API-KEY",
   authDomain: "lostfoundweb-9c840.firebaseapp.com",
   projectId: "lostfoundweb-9c840",
   storageBucket: "lostfoundweb-9c840.appspot.com",
@@ -9,13 +9,13 @@ const firebaseConfig = {
   appId: "1:55877475800:web:80a3f984104fd495c5e6ad"
 };
 
-  // Initialize (compat)
-  firebase.initializeApp(firebaseConfig);
+// Initialize
+firebase.initializeApp(firebaseConfig);
 
-  // Expose globals that the app uses
-  window.auth = firebase.auth();
-  window.db = firebase.firestore();
-  window.storage = firebase.storage();
+// GLOBAL Firebase variables
+const auth = firebase.auth();
+const db   = firebase.firestore();
 </script>
+
 
 
