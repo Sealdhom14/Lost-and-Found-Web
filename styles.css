@@ -3,7 +3,7 @@
 }
 *{box-sizing:border-box;font-family:system-ui,Segoe UI,Roboto,Arial;}
 body{margin:0;background:var(--bg);color:#111}
-.card{background:var(--card);padding:16px;border-radius:10px;box-shadow:0 4px 10px rgba(20,20,50,.04);max-width:900px;margin:20px auto}
+.card{background:var(--card);padding:16px;border-radius:10px;box-shadow:0 6px 18px rgba(20,20,50,.04);max-width:1000px;margin:20px auto}
 .topbar{display:flex;justify-content:space-between;padding:12px 20px;background:#fff;border-bottom:1px solid #eee}
 .grid{display:grid;grid-template-columns:220px 1fr 1fr 220px 260px;gap:12px;padding:16px;align-items:start}
 .col{background:var(--card);padding:12px;border-radius:8px;min-height:200px;overflow:auto}
