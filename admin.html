@@ -1,0 +1,32 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="card" style="max-width:1000px;margin:20px auto;">
+    <h2>Admin Dashboard</h2>
+    <div id="admin-area">
+      <h3>Pending Accounts</h3>
+      <div id="admin-account-requests"></div>
+
+      <h3>Pending Posts</h3>
+      <div id="admin-post-requests"></div>
+    </div>
+    <p><a href="index.html">Back to main</a></p>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="app.js"></script>
+  <script>
+    // admin.html uses the same app.js listeners; admin UI content
+    // admin-specific rendering is handled by app.js when role === 'admin'
+  </script>
+</body>
+</html>
