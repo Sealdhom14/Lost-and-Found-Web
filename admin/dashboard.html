@@ -1,133 +1,50 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Admin Dashboard</title>
-  <link rel="stylesheet" href="../styles.css">
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="../styles.css">
+
+    <!-- Firebase -->
+    <script type="module" src="../firebase-config.js"></script>
+    <script type="module" src="../scripts/admin.js"></script>
 </head>
+
 <body>
-  <div class="container">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-      <h2>Admin Dashboard</h2><!doctype html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>Admin Dashboard</title>
-  <link rel="stylesheet" href="../styles.css">
-</head>
-<body>
-  <div class="container">
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <h2>Admin</h2>
-      <div><span id="adminLabel" class="small"></span> <button id="btnLogoutAdmin">Logout</button></div>
+
+    <div class="top-bar">
+        <h2>Admin Dashboard</h2>
+        <span id="adminLabel"></span>
+        <button id="btnLogoutAdmin">Logout</button>
     </div>
 
     <div class="layout">
-      <div class="col">
-        <h4>Messages</h4>
-        <div id="adminMessages"></div>
-      </div>
 
-      <div class="main-col">
-        <h3>Lost Items</h3>
-        <div id="adminLostList">Loading...</div>
-      </div>
+        <!-- LEFT COLUMN: Messages -->
+        <div class="col small-col">
+            <h3>Messages</h3>
+            <div id="adminMessages"></div>
+        </div>
 
-      <div class="main-col">
-        <h3>Found Items</h3>
-        <div id="adminFoundList">Loading...</div>
-      </div>
+        <!-- CENTER COLUMN: Lost Items -->
+        <div class="col main-col">
+            <h3>Lost Items</h3>
+            <div id="adminLostList">Loading...</div>
+        </div>
 
-      <div class="col">
-        <h4>Notifications</h4>
-        <div id="adminNotifications">No notifications</div>
-      </div>
+        <!-- CENTER COLUMN: Found Items -->
+        <div class="col main-col">
+            <h3>Found Items</h3>
+            <div id="adminFoundList">Loading...</div>
+        </div>
 
-      <div class="col">
-        <h4>Requests</h4>
-        <h5>Account Activation</h5>
-        <div id="accountRequests">Loading...</div>
-        <hr>
-        <h5>Post Approval</h5>
-        <div id="postRequests">Loading...</div>
-      </div>
-    </div>
-  </div>
+        <!-- RIGHT COLUMN: Requests -->
+        <div class="col small-col">
+            <h3>Requests</h3>
+            <div id="adminRequests">Loading...</div>
+        </div>
 
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script>
-
-  <script src="../firebase-config.js"></script>
-  <script src="../scripts/app.js"></script>
-  <script src="../scripts/admin.js"></script>
-
-  <script>
-    document.getElementById('btnLogoutAdmin').addEventListener('click', window.logout);
-  </script>
-</body>
-</html>
-
-      <div>
-        <span id="adminLabel" class="small"></span>
-        <button id="btnLogoutAdmin" class="secondary">Logout</button>
-      </div>
     </div>
 
-    <div class="layout">
-      <!-- Messages -->
-      <div class="col">
-        <h4>Messages</h4>
-        <div id="adminMessages">No messages</div>
-      </div>
-
-      <!-- Lost items (approved) -->
-      <div class="main-col">
-        <h3>Lost Items</h3>
-        <div id="adminLostList">Loading...</div>
-      </div>
-
-      <!-- Found items (approved) -->
-      <div class="main-col">
-        <h3>Found Items</h3>
-        <div id="adminFoundList">Loading...</div>
-      </div>
-
-      <!-- Notifications -->
-      <div class="col">
-        <h4>Notifications</h4>
-        <div id="adminNotifications">No notifications</div>
-      </div>
-
-      <!-- Requests -->
-      <div class="col">
-        <h4>Requests</h4>
-
-        <h5>Account Activation</h5>
-        <div id="accountRequests">Loading...</div>
-
-        <hr>
-
-        <h5>Post Approval</h5>
-        <div id="postRequests">Loading...</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script>
-
-  <script src="../firebase-config.js"></script>
-  <script src="../scripts/app.js"></script>
-  <script src="../scripts/admin.js"></script>
-
-  <script>
-    document.getElementById('btnLogoutAdmin').addEventListener('click', logout);
-  </script>
 </body>
 </html>
