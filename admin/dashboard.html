@@ -3,61 +3,40 @@
 <head>
   <title>Admin Dashboard</title>
   <link rel="stylesheet" href="../styles.css">
-
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
-
-  <script src="../scripts/firebase.js"></script>
 </head>
 <body>
 
-<div class="dashboard">
+<div class="layout">
 
-  <!-- COLUMN 1: MESSAGES -->
-  <div class="side-column">
-    <h3>Messages</h3>
-    <div id="adminMessages">No messages</div>
-  </div>
-
-  <!-- COLUMN 2: LOST ITEMS -->
-  <div class="main-column">
-    <h2>🔴 Lost Items</h2>
-    <div id="lostPostsAdmin"></div>
-  </div>
-
-  <!-- COLUMN 3: FOUND ITEMS -->
-  <div class="main-column">
-    <h2>🟢 Found Items</h2>
-    <div id="foundPostsAdmin"></div>
-  </div>
-
-  <!-- COLUMN 4: NOTIFICATIONS -->
-  <div class="side-column">
-    <h3>Notifications</h3>
-    <div id="adminNotifications">No notifications</div>
-  </div>
-
-  <!-- COLUMN 5: REQUESTS -->
-  <div class="side-column">
-    <h3>Pending Requests</h3>
-
-    <h4>Account Activations</h4>
+  <div class="sidebar">
+    <h3>Account Requests</h3>
     <div id="accountRequests"></div>
+  </div>
 
-    <hr>
-
-    <h4>Post Requests</h4>
+  <div class="sidebar">
+    <h3>Post Requests</h3>
     <div id="postRequests"></div>
+  </div>
 
-    <br>
-    <button onclick="logout()">Logout</button>
+  <div class="main-column">
+    <h3>Lost Items</h3>
+    <div id="lostItems"></div>
+  </div>
+
+  <div class="main-column">
+    <h3>Found Items</h3>
+    <div id="foundItems"></div>
+  </div>
+
+  <div class="sidebar">
+    <h3>Messages</h3>
+    <div id="messages"></div>
   </div>
 
 </div>
 
-<script src="../scripts/admin.js"></script>
+<button onclick="logout()">Logout</button>
 
+<script type="module" src="../scripts/admin.js"></script>
 </body>
 </html>
