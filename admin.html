@@ -4,12 +4,12 @@
   <title>Admin Dashboard</title>
   <link rel="stylesheet" href="../styles.css">
 
-  <!-- Admin -->
-  <script type="module" src="../scripts/admin.js"></script>
-  
+  <!-- Load Firebase Config -->
+  <script type="module" src="../firebase-config.js"></script>
 
-  <!-- Load Admin Script SECOND -->
+  <!-- Load Admin Logic -->
   <script type="module" src="../scripts/admin.js"></script>
+
   <style>
     body {
       background: #f4f6fb;
@@ -60,7 +60,7 @@
 
     .top-bar {
       display: flex;
-      justify-content: flex-end;
+      justify-content: space-between;
       margin-bottom: 20px;
     }
 
@@ -109,30 +109,56 @@
   <!-- MAIN CONTENT -->
   <div class="main">
     <div class="top-bar">
+      <div id="adminLabel" style="font-size:18px; font-weight:600;"></div>
       <button id="logoutBtn" class="logout-btn">Logout</button>
     </div>
 
+    <!-- Pending Accounts -->
     <div class="table-container">
       <div class="table-title">Pending Account Requests</div>
-
-      <table class="table" id="pendingTable">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Status</th>
-            <th>Approve</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Will be filled by JS -->
-        </tbody>
-      </table>
+      <div id="accountRequests"></div>
     </div>
+
+    <br><br>
+
+    <!-- Pending Posts -->
+    <div class="table-container">
+      <div class="table-title">Pending Post Requests</div>
+      <div id="postRequests"></div>
+    </div>
+
+    <br><br>
+
+    <!-- Approved Lost/Found -->
+    <div class="table-container">
+      <div class="table-title">Approved Lost Items</div>
+      <div id="adminLostList"></div>
+    </div>
+
+    <br><br>
+
+    <div class="table-container">
+      <div class="table-title">Approved Found Items</div>
+      <div id="adminFoundList"></div>
+    </div>
+
+    <br><br>
+
+    <!-- Notifications -->
+    <div class="table-container">
+      <div class="table-title">Notifications</div>
+      <div id="adminNotifications"></div>
+    </div>
+
+    <br><br>
+
+    <!-- Messages -->
+    <div class="table-container">
+      <div class="table-title">Messages</div>
+      <div id="adminMessages"></div>
+    </div>
+
   </div>
+
 </body>
 </html>
-
-
-
-
