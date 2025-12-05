@@ -1,43 +1,41 @@
 <!doctype html>
 <html>
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8">
   <title>Lost & Found — Login</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="auth-card">
-    <h1>Lost & Found</h1>
+    <h2>Lost & Found</h2>
     <p class="small">Login to continue</p>
 
-    <input id="loginEmail" type="email" placeholder="Email" />
-    <input id="loginPassword" type="password" placeholder="Password" />
-    <div class="row">
+    <input id="loginEmail" type="email" placeholder="Email">
+    <input id="loginPassword" type="password" placeholder="Password">
+    <div style="display:flex;gap:8px;align-items:center">
       <button id="btnLogin">Login</button>
-      <a class="small right" href="register.html">Create account</a>
+      <a class="small" href="register.html">Create account</a>
     </div>
 
     <p id="loginStatus" class="small"></p>
   </div>
 
-  <!-- Firebase compat SDKs (must load before app scripts) -->
+  <!-- Firebase SDKs (compat) -->
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script>
 
-  <!-- Your config -->
   <script src="firebase-config.js"></script>
-
-  <!-- App logic -->
   <script src="scripts/app.js"></script>
 
   <script>
-    // connect buttons to app.js functions
-    document.getElementById('btnLogin').addEventListener('click', () => {
+    const btnLogin = document.getElementById('btnLogin');
+    btnLogin.addEventListener('click', async () => {
       const email = document.getElementById('loginEmail').value.trim();
-      const pass = document.getElementById('loginPassword').value;
-      login(email, pass);
+      const password = document.getElementById('loginPassword').value;
+      document.getElementById('loginStatus').innerText = 'Logging in...';
+      await window.login(email, password);
     });
   </script>
 </body>
