@@ -3,56 +3,35 @@
 <head>
   <title>User Dashboard</title>
   <link rel="stylesheet" href="../styles.css">
-
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
-
-  <script src="../scripts/firebase.js"></script>
 </head>
 <body>
 
-<div class="dashboard">
+<div class="layout">
 
-  <!-- LEFT: MESSAGES -->
-  <div class="side-column">
+  <div class="sidebar">
     <h3>Messages</h3>
-    <p>No messages yet</p>
+    <div id="messages"></div>
   </div>
 
-  <!-- CENTER: LOST ITEMS -->
   <div class="main-column">
-    <h2>🔴 Lost Items</h2>
-
-    <div id="lostPosts"></div>
-
-    <h2 style="margin-top:30px;">🟢 Found Items</h2>
-    <div id="foundPosts"></div>
-
-    <br>
-
-    <div class="post-box">
-      <textarea id="postText" placeholder="Post lost or found item..."></textarea>
-      <select id="postType">
-        <option value="lost">Lost</option>
-        <option value="found">Found</option>
-      </select>
-      <br>
-      <button onclick="createPost()">Submit Post</button>
-      <p id="postStatus"></p>
-    </div>
+    <h2>Lost Items</h2>
+    <div id="lostItems"></div>
   </div>
 
-  <!-- RIGHT: NOTIFICATIONS -->
-  <div class="side-column">
+  <div class="main-column">
+    <h2>Found Items</h2>
+    <div id="foundItems"></div>
+  </div>
+
+  <div class="sidebar">
     <h3>Notifications</h3>
-    <p>No notifications</p>
+    <div id="notifications"></div>
   </div>
 
 </div>
 
-<script src="../scripts/user.js"></script>
+<button onclick="logout()">Logout</button>
 
+<script type="module" src="../scripts/user.js"></script>
 </body>
 </html>
