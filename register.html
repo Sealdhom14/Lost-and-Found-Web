@@ -1,8 +1,28 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
 <head>
-  <title>Create Account</title>
+  <meta charset="utf-8">
+  <title>Register</title>
   <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="auth-card">
+    <h2>Create Account</h2>
+    <input id="regFullname" placeholder="Full name">
+    <input id="regLocation" placeholder="Location">
+    <input id="regPhone" placeholder="Contact number">
+    <input id="regEmail" type="email" placeholder="Email">
+    <input id="regPassword" type="password" placeholder="Password">
+    <label class="small">Upload ID (photo)</label>
+    <input id="regIdFile" type="file" accept="image/*">
+
+    <div style="display:flex;gap:8px;align-items:center">
+      <button id="btnCreate">Create account</button>
+      <a class="small" href="index.html">Back to Login</a>
+    </div>
+    <p id="regStatus" class="small"></p>
+    <p class="small">After creating an account, log in and click Request Activation inside your profile (we will add that button in dashboard).</p>
+  </div>
 
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
@@ -12,53 +32,23 @@
 
   <script src="firebase-config.js"></script>
   <script src="scripts/app.js"></script>
-</head>
 
-<body>
+  <script>
+    document.getElementById('btnCreate').addEventListener('click', async () => {
+      const fullname = document.getElementById('regFullname').value.trim();
+      const location = document.getElementById('regLocation').value.trim();
+      const phone = document.getElementById('regPhone').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
+      const password = document.getElementById('regPassword').value;
+      const idFile = document.getElementById('regIdFile').files[0];
 
-<div class="auth-card">
-  <h2>Create Account</h2>
-
-  <input id="regFullname" placeholder="Full Name">
-  <input id="regLocation" placeholder="Location">
-  <input id="regPhone" placeholder="Contact Number">
-  <input id="regEmail" type="email" placeholder="Email">
-  <input id="regPassword" type="password" placeholder="Password">
-  <input id="regIdFile" type="file">
-
-  <button id="btnRegister">Create Account</button>
-
-  <p id="regStatus"></p>
-  <a href="index.html">Back to Login</a>
-</div>
-
-<script>
-document.getElementById("btnRegister").addEventListener("click", async () => {
-  try {
-    const fullname = document.getElementById("regFullname").value;
-    const location = document.getElementById("regLocation").value;
-    const phone = document.getElementById("regPhone").value;
-    const email = document.getElementById("regEmail").value;
-    const password = document.getElementById("regPassword").value;
-    const file = document.getElementById("regIdFile").files[0];
-
-    await registerAndCreateUser({
-      fullname,
-      location,
-      phone,
-      email,
-      password,
-      idFile: file
+      try {
+        await window.registerAndCreateUser({ fullname, location, phone, email, password, idFile });
+        document.getElementById('regStatus').innerText = 'Account created. Log in, then click Request Activation.';
+      } catch (e) {
+        document.getElementById('regStatus').innerText = e.message;
+      }
     });
-
-    document.getElementById("regStatus").innerText =
-      "Account created successfully! You may now login.";
-
-  } catch (err) {
-    document.getElementById("regStatus").innerText = err.message;
-  }
-});
-</script>
-
+  </script>
 </body>
 </html>
