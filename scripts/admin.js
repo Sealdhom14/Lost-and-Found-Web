@@ -1,5 +1,3 @@
-console.log("DEBUG auth:", auth);
-
 // scripts/admin.js
 import {
   auth,
